@@ -1,0 +1,107 @@
+openapi: 3.0.1
+info:
+  title: ACME - API de Análise de Fraudes
+  description: |
+    # ACME Frauds API
+
+    Esta API é responsável por fornecer a classificação de risco de um cliente para análise de fraude.
+
+    ---
+    ## Desenvolvedores
+    - Equipe ACME - Squad de Fraudes
+  version: 1.0.0
+
+tags:
+  - name: analise-fraude
+    description: "Análise de risco de cliente para prevenção de fraude"
+
+paths:
+  /v1/analise:
+    post:
+      tags:
+        - analise-fraude
+      summary: Realiza a análise de risco de um cliente
+      description: |
+        Realiza a análise de risco do cliente com base no ID da apólice e do cliente.
+      operationId: analisarRisco
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnaliseFraudeRequest"
+      responses:
+        '200':
+          description: Análise de risco realizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnaliseFraudeResponse"
+        '400':
+          description: Requisição inválida
+
+components:
+  schemas:
+    AnaliseFraudeRequest:
+      type: object
+      properties:
+        apoliceId:
+          type: string
+          format: uuid
+          example: "9fa85f64-5717-4562-b3fc-2c963f66afa6"
+        clienteId:
+          type: string
+          format: uuid
+          example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+
+    AnaliseFraudeResponse:
+      type: object
+      properties:
+        apoliceId:
+          type: string
+          format: uuid
+          example: "9fa85f64-5717-4562-b3fc-2c963f66afa6"
+        clienteId:
+          type: string
+          format: uuid
+          example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        dataAnalise:
+          type: string
+          format: date-time
+          example: "2025-08-27T10:30:00-03:00"
+        classificacao:
+          $ref: "#/components/schemas/TipoCliente"
+        ocorrencias:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ocorrencia"
+
+    Ocorrencia:
+      type: object
+      properties:
+        produtoId:
+          type: string
+          format: uuid
+          example: "8b9a7c6c-5e4d-3b2a-1c0f-00d9f8e7d6c5"
+        tipo:
+          $ref: "#/components/schemas/TipoCliente"
+        descricao:
+          type: string
+          example: "Histórico de sinistros nos últimos 12 meses"
+        dataCriacao:
+          type: string
+          format: date-time
+          example: "2025-08-27T09:00:00-03:00"
+        dataAtualizacao:
+          type: string
+          format: date-time
+          example: "2025-08-27T09:30:00-03:00"
+
+    TipoCliente:
+      type: string
+      enum:
+        - REGULAR
+        - ALTO_RISCO
+        - PREFERENCIAL
+        - SEM_INFORMACAO
+      example: REGULAR

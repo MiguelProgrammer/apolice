@@ -17,4 +17,5 @@ public interface ApoliceOutMapperInfra {
     ApoliceEntity domainToEntity(ApoliceDomain apoliceDomain);
     ApoliceDomain entityToDomain(ApoliceEntity dto);
     ApoliceConsulta projectionToDomain(ApoliceConsultaProjection apoliceConsultaProjection);
+    ApoliceEntity domainConsultaToEntity(ApoliceConsulta apoliceConsulta);
 }

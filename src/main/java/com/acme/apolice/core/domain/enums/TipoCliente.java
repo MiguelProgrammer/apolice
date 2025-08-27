@@ -10,7 +10,8 @@ public enum TipoCliente {
      * Cliente Regular<hr>
      * Cliente com um perfil de risco baixo, com histórico comum e sem registros significativos de risco.
      */
-    REGULAR {
+    REGULAR("Risco baixo") {
+
         @Override
         public Boolean validar(BigDecimal valorSegurado, List<CategoriaSeguro> cobertura) {
             if (cobertura.contains(CategoriaSeguro.VIDA) || cobertura.contains(CategoriaSeguro.RESIDENCIAL)) {
@@ -31,7 +32,8 @@ public enum TipoCliente {
      * Cliente com perfil de maior risco, seja por comportamento ou
      * histórico recente de problemas relacionados a sinistros.
      */
-    ALTO_RISCO {
+    ALTO_RISCO("Maior Risco") {
+
         @Override
         public Boolean validar(BigDecimal valorSegurado, List<CategoriaSeguro> cobertura) {
             if (cobertura.contains(CategoriaSeguro.AUTO)) {
@@ -51,7 +53,7 @@ public enum TipoCliente {
      * Cliente Preferencial<hr>
      * Cliente com um bom relacionamento com a seguradora.
      */
-    PREFERENCIAL {
+    PREFERENCIAL("Bom Relacionamento") {
         @Override
         public Boolean validar(BigDecimal valorSegurado, List<CategoriaSeguro> cobertura) {
             if (cobertura.contains(CategoriaSeguro.VIDA)) {
@@ -71,7 +73,7 @@ public enum TipoCliente {
      * Cliente Sem Informação<hr>
      * Cliente sem histórico ou com pouco histórico com a seguradora.
      */
-    SEM_INFORMACAO {
+    SEM_INFORMACAO("Sem informação") {
         @Override
         public Boolean validar(BigDecimal valorSegurado, List<CategoriaSeguro> cobertura) {
             if (cobertura.contains(CategoriaSeguro.VIDA) || cobertura.contains(CategoriaSeguro.RESIDENCIAL)) {
@@ -86,6 +88,8 @@ public enum TipoCliente {
             return valorSegurado.compareTo(new BigDecimal("55000.00")) <= 0;
         }
     };
+
+    TipoCliente(String s) {}
 
     public abstract Boolean validar(BigDecimal valorSegurado, List<CategoriaSeguro> cobertura);
 

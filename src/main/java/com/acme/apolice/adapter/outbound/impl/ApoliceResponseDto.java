@@ -1,4 +1,4 @@
-package com.acme.apolice.adapter.outbound.reponse;
+package com.acme.apolice.adapter.outbound.impl;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

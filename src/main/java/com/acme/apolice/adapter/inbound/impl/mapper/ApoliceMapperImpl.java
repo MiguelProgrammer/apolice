@@ -1,4 +1,4 @@
-package com.acme.apolice.adapter.inbound.impl;
+package com.acme.apolice.adapter.inbound.impl.mapper;
 
 import com.acme.apolice.adapter.exception.AdapterException;
 import com.acme.apolice.adapter.inbound.ApoliceConsulta;

@@ -1,7 +1,7 @@
 package com.acme.apolice.core.usecase;
 
 import com.acme.apolice.adapter.inbound.ApoliceConsulta;
-import com.acme.apolice.adapter.inbound.impl.ApoliceMapperImpl;
+import com.acme.apolice.adapter.inbound.impl.mapper.ApoliceMapperImpl;
 import com.acme.apolice.core.ports.ApoliceRepositoryPort;
 import com.acme.apolice.infrastructure.adapter.outbound.ApoliceOutMapperInfra;
 import com.acme.apolice.infrastructure.adapter.outbound.CoberturaOutMapperInfra;

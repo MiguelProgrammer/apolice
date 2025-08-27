@@ -1,6 +1,6 @@
-package com.acme.apolice.framework.driver.kafka;
+package com.acme.apolice.framework.driver.kafka.pub;
 
-import com.acme.apolice.core.ports.driven.EventPublisher;
+import com.acme.apolice.core.ports.driven.kafka.EventPublisher;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 

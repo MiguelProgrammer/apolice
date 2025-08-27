@@ -1,59 +1,29 @@
-package com.acme.apolice.infrastructure.database.postgresql.apolice.entities.cliente;
+package com.acme.apolice.core.domain.cliente;
 
 import com.acme.apolice.core.domain.enums.TipoCliente;
-import jakarta.persistence.*;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@Entity
-@Table(name = "cliente")
-@SequenceGenerator(name = "cliente_sequence")
-public class ClienteEntity implements Serializable {
+public class ClienteDomain {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
-    @Column(name = "apolice_id")
     private UUID apoliceId;
-
-    @Column(name = "cliente_id")
     private UUID clienteId;
-
-    @Column(name = "data_analise")
     private OffsetDateTime dataAnalise;
-
-    @Column(name = "classificacao")
     private TipoCliente classificacao;
+    private Set<OcorrenciaDomain> occurrencias = new HashSet<>();
 
-    @OneToMany(mappedBy = "cliente", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OcorrenciaEntity> occurrencias;
-
-    public ClienteEntity() {
+    public ClienteDomain() {
     }
 
-    public ClienteEntity(UUID id, UUID apoliceId, UUID clienteId, OffsetDateTime dataAnalise, TipoCliente classificacao, Set<OcorrenciaEntity> occurrencias) {
-        this.id = id;
+    public ClienteDomain(UUID apoliceId, UUID clienteId, OffsetDateTime dataAnalise, TipoCliente classificacao, Set<OcorrenciaDomain> occurrencias) {
         this.apoliceId = apoliceId;
         this.clienteId = clienteId;
         this.dataAnalise = dataAnalise;
         this.classificacao = classificacao;
         this.occurrencias = occurrencias;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public UUID getApoliceId() {
@@ -88,11 +58,11 @@ public class ClienteEntity implements Serializable {
         this.classificacao = classificacao;
     }
 
-    public Set<OcorrenciaEntity> getOccurrencias() {
+    public Set<OcorrenciaDomain> getOccurrencias() {
         return occurrencias;
     }
 
-    public void setOccurrencias(Set<OcorrenciaEntity> occurrencias) {
+    public void setOccurrencias(Set<OcorrenciaDomain> occurrencias) {
         this.occurrencias = occurrencias;
     }
 }

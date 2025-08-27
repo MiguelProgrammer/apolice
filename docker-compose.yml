@@ -1,32 +1,9 @@
+version: "3.9"
+
 services:
-  apolice-app:
-    build:
-      context: .          # raiz do projeto (onde está pom.xml, src/, Dockerfile)
-      dockerfile: Dockerfile
-    container_name: minha-apolice-app
-    ports:
-      - "8080:8080"
-    depends_on:
-      - apolice-db
-    environment:
-      # Spring profile
-      SPRING_PROFILES_ACTIVE: developer
-
-      # Datasource
-      SPRING_DATASOURCE_URL: jdbc:postgresql://apolice-db:5432/apolice
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-
-      # JPA
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: "true"
-
-      # Timezone JVM
-      JAVA_TOOL_OPTIONS: "-Duser.timezone=America/Sao_Paulo"
-      TZ: America/Sao_Paulo
-
+  # Banco central compartilhado
   apolice-db:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: apolice-db
     environment:
       POSTGRES_DB: apolice
@@ -37,17 +14,109 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d apolice"]
+      interval: 5s
+      retries: 5
+      timeout: 5s
 
+  # Aplicação de apólices
+  apolice-app:
+    build:
+      context: ./apolice
+      dockerfile: Dockerfile
+    container_name: apolice-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      apolice-db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: developer
+      SPRING_DATASOURCE_URL: jdbc:postgresql://apolice-db:5432/apolice
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      JAVA_TOOL_OPTIONS: "-Duser.timezone=America/Sao_Paulo"
+      TZ: America/Sao_Paulo
+
+  # Aplicação de fraudes (adaptada para sh)
+  fraude-app:
+    image: migprogrammer/fraude-api:1.0
+    container_name: fraude-app
+    entrypoint: ["sh", "-c", "java -jar /app/fraude-api.jar"]
+    ports:
+      - "9090:9090"
+    depends_on:
+      apolice-db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: developer
+      SPRING_DATASOURCE_URL: jdbc:postgresql://apolice-db:5432/apolice
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_JPA_SHOW_SQL: "true"
+      JAVA_TOOL_OPTIONS: "-Duser.timezone=America/Sao_Paulo"
+      TZ: America/Sao_Paulo
+
+  # Admin web do PostgreSQL
   pg-admin-web:
     image: sosedoff/pgweb
     container_name: pgweb
     environment:
-      - PGWEB_DATABASE_URL=postgres://postgres:postgres@apolice-db:5432/apolice?sslmode=disable
-      - PGWEB_WAIT_FOR_DB=10s
+      PGWEB_DATABASE_URL: postgres://postgres:postgres@apolice-db:5432/apolice?sslmode=disable
+      PGWEB_WAIT_FOR_DB: 10s
     ports:
       - "8081:8081"
     depends_on:
       - apolice-db
+
+  # Zookeeper
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    container_name: zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+    restart: unless-stopped
+
+  # Kafka
+  kafka:
+    image: bitnami/kafka:3.5
+    container_name: kafka
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    depends_on:
+      - zookeeper
+    restart: unless-stopped
+
+  # Kafdrop
+  kafdrop:
+    image: obsidiandynamics/kafdrop:4.1.0
+    container_name: kafdrop
+    environment:
+      - KAFKA_BROKERCONNECT=kafka:9092
+      - JVM_OPTS=-Xms32M -Xmx64M
+    ports:
+      - "9000:9000"
+    depends_on:
+      - kafka
+    restart: unless-stopped
 
 volumes:
   pgdata:

@@ -16,8 +16,13 @@ import com.acme.apolice.infrastructure.adapter.outbound.ApoliceOutMapperInfra;
 import com.acme.apolice.infrastructure.adapter.outbound.CoberturaOutMapperInfra;
 import com.acme.apolice.infrastructure.adapter.outbound.HistoricoOutMapperInfra;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
+import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.util.backoff.FixedBackOff;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
@@ -66,4 +71,18 @@ public class ConfigBeans {
                                                ClienteController clienteController) {
         return new FraudeRestAdapter(objectMapper, restTemplate, clienteController);
     }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
+    }
+
+    @Bean
+    public DefaultErrorHandler errorHandler(KafkaTemplate<String, String> kafkaTemplate) {
+        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate);
+        return new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 3));
+    }
+
 }

@@ -59,7 +59,7 @@ public class EventApoliceUseCase {
         try {
             eventPublisher.publish(
                     APOLICE_ENQUADRAMENTO_TOPIC,
-                    eventDto.apoliceId().toString(),
+                    eventDto.getApoliceId().toString(),
                     objectMapper.writeValueAsString(eventDto));
 
         } catch (ApoliceUseCaseBusinessException | JsonProcessingException e) {

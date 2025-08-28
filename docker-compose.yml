@@ -99,15 +99,10 @@ services:
     ports:
       - "2181:2181"
     restart: unless-stopped
-    healthcheck:
-      test: [ "CMD-SHELL", "/opt/bitnami/scripts/zookeeper/healthcheck.sh" ]
-      interval: 10s
-      retries: 5
-      timeout: 5s
-      start_period: 10s
+    # Remova o healthcheck daqui.
 
   # -------------------------------
-  # Kafka simplificado
+  # Kafka
   # -------------------------------
   kafka:
     image: bitnami/kafka:3.5
@@ -127,14 +122,16 @@ services:
     ports:
       - "9092:9092"
     depends_on:
-      zookeeper:
-        condition: service_healthy
+      - zookeeper
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server kafka:9092 --list || exit 1"]
-      interval: 10s
-      retries: 5
-      timeout: 10s
+    entrypoint:
+      - /wait-for-it.sh
+      - zookeeper:2181
+      - --timeout=120
+      - --strict
+      - --
+      - /opt/bitnami/kafka/bin/kafka-server-start.sh
+      - /opt/bitnami/kafka/config/server.properties
 
   # -------------------------------
   # Kafdrop

@@ -3,6 +3,7 @@ package com.acme.apolice.core.usecase;
 import com.acme.apolice.adapter.inbound.ApoliceConsulta;
 import com.acme.apolice.adapter.inbound.impl.mapper.ApoliceMapperImpl;
 import com.acme.apolice.core.ports.ApoliceRepositoryPort;
+import com.acme.apolice.core.usecase.exception.ClienteUseCaseBusinessException;
 import com.acme.apolice.infrastructure.adapter.outbound.ApoliceOutMapperInfra;
 import com.acme.apolice.infrastructure.adapter.outbound.CoberturaOutMapperInfra;
 import com.acme.apolice.infrastructure.adapter.outbound.HistoricoOutMapperInfra;
@@ -20,6 +21,10 @@ public class ClienteUseCase {
     }
 
     public ApoliceConsulta listaApolicePorCliente(UUID idCliente) {
-        return mapperApolice.mapperProjection(apoliceAdapter.listaApolice(idCliente));
+        try {
+            return mapperApolice.mapperProjection(apoliceAdapter.listaApolice(idCliente));
+        } catch (ClienteUseCaseBusinessException e){
+            throw new ClienteUseCaseBusinessException(e.getMessage());
+        }
     }
 }

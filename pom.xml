@@ -15,7 +15,6 @@
     <groupId>com.acme.apolice</groupId>
     <artifactId>apolice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>apolice</name>
     <description>Gerencia processos de emissões de apólices de seguros</description>
 
     <licenses>

@@ -3,7 +3,6 @@ package com.acme.apolice.adapter.controller;
 import com.acme.apolice.adapter.inbound.ApoliceConsulta;
 import com.acme.apolice.core.usecase.ClienteUseCase;
 import com.acme.apolice.core.usecase.EventApoliceUseCase;
-import com.acme.fraude.AnaliseFraudeResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 

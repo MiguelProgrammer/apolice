@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/analise")
-public class FraudeResource implements V1Api {
+public class FraudeResource /*implements V1Api*/ {
 
     @Autowired
     private FraudeRestAdapter fraudeRestAdapter;
@@ -25,7 +25,7 @@ public class FraudeResource implements V1Api {
      * @return Análise de risco realizada com sucesso (status code 200)
      * or Requisição inválida (status code 400)
      */
-    @Override
+
     @PostMapping
     public ResponseEntity<AnaliseFraudeResponse> analisarRisco(AnaliseFraudeRequest analiseFraudeRequest) {
         AnaliseFraudeResponse analiseFraudeResponse = fraudeRestAdapter.analisarRisco(analiseFraudeRequest);

@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/cliente")
-public class ClienteResource implements V1Api {
+public class ClienteResource /*implements V1Api*/ {
 
     @Autowired
     private ClienteController controller;

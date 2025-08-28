@@ -1,8 +1,6 @@
 package com.acme.apolice.infrastructure.adapter.outbound;
 
-import com.acme.apolice.core.domain.apolice.ApoliceDomain;
 import com.acme.apolice.core.domain.cobertura.CoberturaDomain;
-import com.acme.apolice.infrastructure.database.postgresql.apolice.entities.apolice.ApoliceEntity;
 import com.acme.apolice.infrastructure.database.postgresql.apolice.entities.cobertura.CoberturaEntity;
 import org.mapstruct.Mapper;
 

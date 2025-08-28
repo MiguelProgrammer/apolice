@@ -14,6 +14,7 @@ import com.acme.apolice.core.domain.enums.TipoCliente;
 import com.acme.apolice.core.ports.ApoliceRepositoryPort;
 import com.acme.apolice.core.ports.driven.kafka.EventPublisher;
 import com.acme.apolice.core.usecase.exception.ApoliceUseCaseBusinessException;
+import com.acme.apolice.core.usecase.exception.EventUseCaseBusinessException;
 import com.acme.apolice.infrastructure.adapter.outbound.ApoliceOutMapperInfra;
 import com.acme.apolice.infrastructure.database.postgresql.apolice.entities.apolice.ApoliceEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -68,17 +69,22 @@ public class EventApoliceUseCase {
     }
 
     public void processarApolice(ApoliceConsulta apoliceConsulta) {
-        switch (apoliceConsulta.getStatus()) {
-            case RECEBIDO ->
-                    registraOcorrencia(apoliceConsulta, validaCliente(apoliceConsulta) ? Estado.VALIDADO : Estado.REJEITADO);
-            case PENDENTE ->
-                    registraOcorrencia(apoliceConsulta, validaCliente(apoliceConsulta) ? Estado.APROVADO : Estado.REJEITADO);
-            case VALIDADO ->
-                    registraOcorrencia(apoliceConsulta, validaCliente(apoliceConsulta) ? Estado.PENDENTE : Estado.REJEITADO);
-            case APROVADO, REJEITADO, CANCELADA ->
-                    System.out.println("Ação não permitida. A apólice " + apoliceConsulta.getId() + " já está em um estado final: " + apoliceConsulta.getStatus());
-            default -> {
+
+        try {
+            switch (apoliceConsulta.getStatus()) {
+                case RECEBIDO ->
+                        registraOcorrencia(apoliceConsulta, validaCliente(apoliceConsulta) ? Estado.VALIDADO : Estado.REJEITADO);
+                case PENDENTE ->
+                        registraOcorrencia(apoliceConsulta, validaCliente(apoliceConsulta) ? Estado.APROVADO : Estado.REJEITADO);
+                case VALIDADO ->
+                        registraOcorrencia(apoliceConsulta, validaCliente(apoliceConsulta) ? Estado.PENDENTE : Estado.REJEITADO);
+                case APROVADO, REJEITADO, CANCELADA ->
+                        System.out.println("Ação não permitida. A apólice " + apoliceConsulta.getId() + " já está em um estado final: " + apoliceConsulta.getStatus());
+                default -> {
+                }
             }
+        } catch (EventUseCaseBusinessException e){
+            throw new EventUseCaseBusinessException(e.getMessage());
         }
     }
 

@@ -4,6 +4,7 @@ import com.acme.apolice.adapter.inbound.ApoliceConsulta;
 import com.acme.apolice.adapter.inbound.impl.mapper.ApoliceMapperImpl;
 import com.acme.apolice.core.domain.apolice.ApoliceDomain;
 import com.acme.apolice.core.ports.ApoliceRepositoryPort;
+import com.acme.apolice.core.usecase.exception.ApoliceUseCaseBusinessException;
 import com.acme.apolice.infrastructure.adapter.outbound.ApoliceOutMapperInfra;
 import com.acme.apolice.infrastructure.adapter.outbound.CoberturaOutMapperInfra;
 import com.acme.apolice.infrastructure.adapter.outbound.HistoricoOutMapperInfra;
@@ -25,14 +26,12 @@ public class ApoliceUseCase {
     }
 
     public ApoliceDomain enquadramento(ApoliceDomain domain) {
-
-        ApoliceEntity entity = mapperApolice.mapperApolice(domain);
-        return inMapper.entityToDomain(apoliceAdapter.save(entity));
-
-        /**
-         * esse caso de uso será chamado via api de fraude
-         *eventApoliceUseCase.executar(apoliceDomain);
-         */
+        try {
+            ApoliceEntity entity = mapperApolice.mapperApolice(domain);
+            return inMapper.entityToDomain(apoliceAdapter.save(entity));
+        } catch (ApoliceUseCaseBusinessException e){
+            throw new ApoliceUseCaseBusinessException(e.getMessage());
+        }
     }
 
     public ApoliceConsulta apoliceDetalhada(UUID id) {

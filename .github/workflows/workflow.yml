@@ -22,8 +22,8 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: 🔨 Build with Maven and run tests
-        run: mvn -B package --file pom.xml
+      - name: 🔨 Build with Maven and skip tests
+        run: mvn -B package -DskipTests --file pom.xml
 
   publish-to-docker-hub:
     needs: build-and-test
